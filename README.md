@@ -36,8 +36,7 @@ sudo python3 recover.py
 
 That's it. Recovered files land in `~/recovered`, named by capture time (e.g. `20260612_143022.jpg`) so they stay in order.
 
-<details>
-<summary>📺 What it looks like</summary>
+### What a run looks like
 
 ```text
 Detected disks:
@@ -56,7 +55,6 @@ Reading: /dev/rdisk4  (127.9GB)  [READ-ONLY — the card is never written]
  -> /Users/you/recovered
 ================================================================
 ```
-</details>
 
 ---
 
@@ -85,12 +83,9 @@ Files split into pieces across the card (large videos, heavily-used cards) can o
 
 ---
 
-## Options & details
+## Command-line options
 
-<details>
-<summary><b>Command-line flags</b> (for repeat runs / automation)</summary>
-
-Anything you leave out is asked interactively.
+Anything you leave out is asked interactively, so you can also just run `sudo python3 recover.py`.
 
 ```bash
 sudo python3 recover.py \
@@ -106,27 +101,23 @@ python3 recover.py --image card.img --out ~/out  # work on a raw image file inst
 ```
 
 Working from an image file (`--image`) doesn't need `sudo`. You can also make a read-only image first with `ddrescue` and recover from that.
-</details>
 
-<details>
-<summary><b>Output folders</b></summary>
+### Output folders
 
 - **main folder** — your recovered files (named by capture time when readable)
 - `_unknown_date/` — files whose date couldn't be read (only when a date filter is set)
 - `_other_size/` — files that don't match `--megapixels` (likely thumbnails/previews)
 - `_partial/` — damaged or incomplete files (`.partial`); these may not open
-</details>
 
-<details>
-<summary><b>Camera RAW coverage</b></summary>
+### Camera RAW coverage
 
 Recognised with the correct extension: **Canon** CR2/CR3, **Nikon** NEF, **Sony** ARW, **Fujifilm** RAF, **Olympus/OM** ORF, **Panasonic** RW2, **Adobe/Leica** DNG, **Pentax** PEF, **Samsung** SRW, **HEIC**.
 
-Most RAW formats are TIFF-based, so even a brand not listed here is usually still recovered — just saved as `.tif`, which you can rename. A few non-TIFF formats (e.g. Sigma X3F, Phase One IIQ) aren't handled yet.
-</details>
+Most RAW formats are TIFF-based, so even a brand not listed here is usually still recovered — just saved as `.tif`, which you can rename. A few non-TIFF formats (e.g. Sigma X3F, Phase One IIQ) aren't handled yet — please open an issue if you need one.
 
-<details>
-<summary><b>How it works</b></summary>
+---
+
+## How it works
 
 1. Reads the card once and finds the start of every file by its **signature** (e.g. JPEG starts with `FF D8 FF`).
 2. Finds each file's true **end** correctly:
@@ -138,17 +129,24 @@ Most RAW formats are TIFF-based, so even a brand not listed here is usually stil
 4. Writes each recovered file to the output folder. The card is only ever read.
 
 It's a single, commented file using only the Python standard library — `recover.py`.
-</details>
 
 ---
 
-## For developers
+## Contributing & feedback
+
+**Issues, ideas, and pull requests are all genuinely welcome — please don't hold back.**
+
+- Did it **not** work on your card, or recover too little? That's exactly the kind of report that helps — [open an issue](https://github.com/psm9619/sd-photo-rescue/issues) and tell me the camera/card and what happened.
+- Want a **RAW format or camera** that isn't supported yet (Sigma X3F, Phase One IIQ, …)? Ask for it — adding signatures is straightforward.
+- Spotted a bug or have an improvement? PRs are very welcome, big or small.
+
+It's a single, readable file, so changes are easy to make and review. Please run the tests before sending a PR:
 
 ```bash
-python3 tests/test_recover.py     # run the test suite
+python3 tests/test_recover.py
 ```
 
-Single-file, standard-library Python 3 — easy to read and audit. Issues and pull requests are welcome (e.g. support for more RAW formats).
+No question is too basic — if it didn't help you get your photos back, I want to know.
 
 ---
 
