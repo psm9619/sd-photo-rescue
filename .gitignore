@@ -1,0 +1,16 @@
+# recovered output / disk images — never commit user data
+recovered/
+_unknown_date/
+*.img
+*.dd
+*.logfile
+*.mapfile
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# os
+.DS_Store
