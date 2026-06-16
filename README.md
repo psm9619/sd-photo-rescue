@@ -52,14 +52,26 @@ sudo python3 recover.py \
     --disk /dev/disk4 \          # macOS; on Linux e.g. /dev/sdb
     --out ~/recovered \
     --types jpeg,raw,video \     # any of: jpeg, raw, video
-    --date-from 2026-06-12 \
-    --date-to   2026-06-12       # or --date 2026-06-12 for a single day
+    --date-from 2026-06-12 \     # omit both --date-* to recover ALL dates
+    --date-to   2026-06-12 \     # or --date 2026-06-12 for a single day
+    --megapixels 26              # optional: your camera's MP (sorts full-size vs thumbnails)
 
 python3 recover.py --list                       # just list disks
 python3 recover.py --image card.img --out ~/out # work on a raw image file instead
 ```
 
 Working from an image file (`--image`) does **not** need sudo. If you prefer, make a read-only image first with `ddrescue` and recover from that.
+
+### Output folders
+
+- main folder — your recovered files (named by capture time when readable)
+- `_unknown_date/` — files whose date couldn't be read (only when a date filter is set)
+- `_other_size/` — files that don't match `--megapixels` (likely thumbnails/previews)
+- `_partial/` — damaged or incomplete carves (`.partial`); these may not open
+
+### Camera RAW coverage
+
+Fully recognised (correct extension): **Canon** CR2/CR3, **Nikon** NEF, **Sony** ARW, **Fujifilm** RAF, **Olympus/OM** ORF, **Panasonic** RW2, **Adobe/Leica** DNG, **Pentax** PEF, **Samsung** SRW, **HEIC**. Most RAW formats are TIFF-based, so even a brand not in this list is usually still recovered — just saved as `.tif`, which you can rename. A few non-TIFF formats (e.g. Sigma X3F, Phase One IIQ) aren't handled yet.
 
 ---
 
@@ -82,14 +94,15 @@ See `recover.py` — it's commented and uses only the standard library.
 - **No disks listed / permission error** → run with `sudo`.
 - **Very few or no files recovered** → the card may have been *fully* erased (secure-erase/low-level format) or already overwritten by new photos. Quick formats are recoverable; full erases usually are not.
 - **Original file names (e.g. `DSCF1234.JPG`) aren't restored** → expected. Formatting wipes the name table, so files are named by capture time instead.
-- **It's slow** → it reads the whole card at least once; a 128 GB card can take 15–40 minutes. Progress is printed as it goes.
+- **It's slow** → it reads the whole card once; a 128 GB card typically takes 20–60 minutes, longer on slow/USB-2 readers or with video. It is **not** stuck as long as the progress lines keep updating. Speed is limited by how fast the card/reader can be read — there's no way around reading the card once.
+- **Some files won't open** → carving can't rebuild *fragmented* files (large videos / heavily-used cards). Those land in `_partial/` or may be slightly corrupt. This is a normal limit of carving.
 - **Linux**: needs `lsblk` (util-linux, present by default) and `sudo`.
 
 ---
 
 ## Safety
 
-This tool opens the card with `O_RDONLY` and only ever reads from it. It never writes, formats, or modifies the card. Recovered files are written to a **separate** output folder. Before reading, it unmounts the card so the operating system can't write to it either.
+This tool opens the card with `O_RDONLY` and only ever reads from it. It never writes, formats, or modifies the card. Recovered files are written to a **separate** output folder. Before reading, on macOS it unmounts the card so the OS can't write to it; on Linux it attempts to unmount and warns if it can't. Either way the card is opened strictly read-only.
 
 ---
 
@@ -109,11 +122,15 @@ sudo python3 recover.py
 → 디스크 목록이 뜨면 **카드 번호만 입력** → 복구할 종류/날짜/저장폴더를 고르면 끝.
 
 - JPEG + RAW(CR2/CR3/NEF/ARW/RAF/ORF/RW2/DNG/HEIC) + 영상(MP4/MOV) 복구
-- EXIF 촬영일로 **기간 필터** 가능 (`--date-from`/`--date-to`)
+- EXIF 촬영일로 **기간 필터** 가능 (`--date-from`/`--date-to`). 날짜 모르면 비우면 **전체 복구**
+- 카메라 화소(`--megapixels 26`)를 주면 **풀사이즈 사진과 썸네일/미리보기를 분리**해 정리
+- RAW: Canon/Nikon/Sony/Fujifilm/Olympus/Panasonic/Pentax/Samsung/Adobe(DNG)/HEIC 지원. 대부분의 RAW가 TIFF 기반이라 목록에 없는 브랜드도 보통 `.tif`로 복구됨(이름만 바꾸면 됨)
 - 카드에 **절대 쓰지 않음**(읽기 전용). 결과는 별도 폴더(`~/recovered`)에 저장
 - 결과 파일명은 촬영시각(`20260612_143022_*.jpg`)이라 시간순 정렬됨
 - 원본 파일명(DSCF####)은 포맷이 지워서 복원되지 않습니다(촬영시각 이름으로 저장)
+- 결과 폴더 안 `_partial/`(손상·불완전), `_other_size/`(화소 불일치), `_unknown_date/`(날짜 미상)로 분류됨
 
+참고: 조각난(fragmented) 큰 영상/파일은 카빙 원리상 일부만 복구될 수 있습니다(`_partial/`).
 복구가 거의 안 되면 빠른 포맷이 아니라 **완전 포맷/보안 삭제**였을 수 있습니다(이 경우 복구 어려움).
 
 ---

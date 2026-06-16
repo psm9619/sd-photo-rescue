@@ -145,6 +145,48 @@ def test_carve_end_to_end():
             os.unlink(os.path.join(out, f))
 
 
+def make_tiff_raw():
+    # CR2-like TIFF: main strip data far out, plus an embedded JPEG preview signature
+    # at offset 2000 (the trap that the old code truncated on).
+    buf = bytearray(55000)
+    le = "<"
+    buf[0:4] = b"II\x2a\x00"
+    struct.pack_into(le + "I", buf, 4, 8)          # IFD0 at offset 8
+    struct.pack_into(le + "H", buf, 8, 4)          # 4 entries
+    def entry(o, tag, val):
+        struct.pack_into(le + "HHII", buf, o, tag, 4, 1, val)   # tag, LONG, count1, value
+    entry(10, 0x0111, 5000)        # StripOffsets
+    entry(22, 0x0117, 50000)       # StripByteCounts -> extent 55000
+    entry(34, 0x0201, 2000)        # JPEGInterchangeFormat (preview at 2000)
+    entry(46, 0x0202, 1000)        # JPEGInterchangeFormatLength
+    struct.pack_into(le + "I", buf, 58, 0)         # next IFD = 0
+    buf[2000:2003] = b"\xff\xd8\xff"               # embedded preview signature
+    return bytes(buf)
+
+
+def test_tiff_no_truncation():
+    raw = make_tiff_raw()
+    path = tmpfile(raw)
+    r = R.Reader(path)
+    try:
+        end = R.tiff_length(r, 0, r.size)
+        assert end == 55000, end       # full extent, NOT truncated to the preview at 2000
+        print(f"  [OK] TIFF RAW true extent via IFD walk (not truncated at preview): {end}B")
+    finally:
+        r.close(); os.unlink(path)
+
+
+def test_jpeg_dimensions():
+    assert R.jpeg_dimensions(make_jpeg()) == (16, 16)
+    print("  [OK] JPEG dimensions read from SOF (for megapixel check)")
+
+
+def test_truthy():
+    assert R._truthy("1") and R._truthy(1) and R._truthy(True) and R._truthy("true")
+    assert not R._truthy("0") and not R._truthy(0) and not R._truthy(None) and not R._truthy("")
+    print("  [OK] _truthy normalizes lsblk string/bool/int (Linux disk safety)")
+
+
 def test_disk_parsers_smoke():
     # parsers must not crash even if the OS tools aren't present
     R.list_disks()
@@ -158,6 +200,9 @@ if __name__ == "__main__":
     test_iso()
     test_raf()
     test_exif_date()
+    test_tiff_no_truncation()
+    test_jpeg_dimensions()
+    test_truthy()
     test_carve_end_to_end()
     test_disk_parsers_smoke()
     print("ALL PASSED ✅")
