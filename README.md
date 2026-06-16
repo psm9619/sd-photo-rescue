@@ -150,6 +150,16 @@ No question is too basic — if it didn't help you get your photos back, I want 
 
 ---
 
+## Support
+
+This tool is free and always will be. If it helped you get your photos back and you'd like to say thanks, you can buy me a coffee — completely optional. ☕
+
+<a href="https://buymeacoffee.com/soominp0619" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="44"></a>
+
+And if it saved your day, a ⭐ on the repo helps others find it too.
+
+---
+
 ## Safety & license
 
 The card is opened with `O_RDONLY` and only ever read — never written, formatted, or modified. On macOS the card is unmounted first so the OS can't touch it; on Linux the tool unmounts it and warns if it can't.

@@ -150,6 +150,16 @@ python3 tests/test_recover.py
 
 ---
 
+## 支援
+
+このツールは無料で、これからもずっと無料です。写真を取り戻すお役に立てて、感謝の気持ちを伝えたい方は、よければコーヒーを一杯おごってください — もちろん任意です。☕
+
+<a href="https://buymeacoffee.com/soominp0619" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="44"></a>
+
+役に立ったら、リポジトリに ⭐（Star）を付けていただけると、他の方が見つけやすくなります。
+
+---
+
 ## 安全性とライセンス
 
 カードは `O_RDONLY`（読み取り専用）で開き、読み取るだけです — 書き込み・フォーマット・変更は行いません。macOS ではカードを先にアンマウントしてOSが触れないようにし、Linux ではアンマウントを試み、できない場合は警告します。

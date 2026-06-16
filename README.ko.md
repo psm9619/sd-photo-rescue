@@ -150,6 +150,16 @@ python3 tests/test_recover.py
 
 ---
 
+## 후원
+
+이 도구는 무료이고 앞으로도 그렇습니다. 사진을 되찾는 데 도움이 됐고 고마움을 표하고 싶으시다면 커피 한 잔 사주셔도 좋아요 — 전혀 부담 갖지 마세요. ☕
+
+<a href="https://buymeacoffee.com/soominp0619" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="44"></a>
+
+도움이 되셨다면 저장소에 ⭐(Star)를 눌러주시면 다른 분들이 찾는 데도 도움이 됩니다.
+
+---
+
 ## 안전성 & 라이선스
 
 카드는 `O_RDONLY`(읽기 전용)로 열려 읽기만 합니다 — 쓰기·포맷·수정을 하지 않습니다. macOS에서는 먼저 카드를 마운트 해제해 OS가 건드리지 못하게 하고, Linux에서는 마운트 해제를 시도한 뒤 실패하면 알려줍니다.
