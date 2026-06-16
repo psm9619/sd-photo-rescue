@@ -1,53 +1,96 @@
 # sd-photo-rescue
 
+![license](https://img.shields.io/badge/license-MIT-blue) ![python](https://img.shields.io/badge/python-3-blue) ![platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey) ![card](https://img.shields.io/badge/card-read--only-brightgreen)
+
 **English** · [한국어](README.ko.md) · [日本語](README.ja.md)
 
-Recover photos and videos from an SD card that was **formatted by mistake** (or won't mount), straight from your terminal. One Python file, no installation, **read-only and safe**.
+**Accidentally formatted your SD card? Your photos are very likely still there.**
 
-> Formatting a card usually erases only the file table — your photos are still physically there until something overwrites them. This tool reads the card **without writing to it** and rebuilds the files by their content ("file carving").
+sd-photo-rescue is a free, **read-only** tool that scans the card and rebuilds your photos and videos — from the terminal, in one command. No installation, nothing to buy.
 
-- ✅ Recovers **JPEG**, **RAW** (Canon CR2/CR3, Nikon NEF, Sony ARW, Fujifilm RAF, Olympus ORF, Panasonic RW2, Adobe DNG, HEIC) and **video** (MP4/MOV)
-- ✅ Can keep only the photos shot in a **date range** (from EXIF)
-- ✅ **Never writes to your card** — opens it read-only
-- ✅ Interactive: it finds your disks, you just pick a number
-- ✅ Pure Python 3 standard library — nothing to install
-- 💻 macOS and Linux (Windows: use `--image` on a raw image for now)
+> When a camera or computer "formats" a card, it usually just clears the index, not the actual photo data. Until new files overwrite them, your shots are still on the card. This tool reads the card **without ever writing to it** and recovers files by their content.
 
 ---
 
-## ⚠️ First, before anything else
+## ⚠️ Do this first
 
-**Stop using the card immediately.** Do not take more photos, do not let the camera or any app write to it, do not re-format it. Every write can permanently overwrite recoverable photos. Take the card out and use a reader.
-
----
-
-## Quick start
-
-### macOS / Linux
-
-1. Download the one file `recover.py` (or `git clone` this repo).
-   ```bash
-   curl -fsSLO https://raw.githubusercontent.com/psm9619/sd-photo-rescue/main/recover.py
-   ```
-2. Plug in the card and run (it needs `sudo` to read the raw device):
-   ```bash
-   sudo python3 recover.py
-   ```
-3. Answer the questions:
-   - it lists your disks → **type the number** of your card
-   - pick what to recover (photos / +RAW / +video)
-   - optional date range
-   - choose an output folder
-
-That's it. Recovered files land in the output folder (default `~/recovered`), named by capture time like `20260612_143022_*.jpg` so they sort chronologically.
-
-> **Make sure you pick the right disk.** The tool shows size and "internal/external" and warns on system disks. Your card is the small **external/removable** one (e.g. 64 GB / 128 GB).
+**Stop using the card now.** Don't shoot more photos, don't let any app write to it, and don't re-format it — every write can overwrite what's still recoverable. Eject it and use a card reader.
 
 ---
 
-## Options (for repeat runs / automation)
+## Get your photos back — 3 steps
 
-Anything you don't pass is asked interactively.
+On **macOS** or **Linux**:
+
+**1. Download the tool** (one file, nothing to install):
+```bash
+curl -fsSLO https://raw.githubusercontent.com/psm9619/sd-photo-rescue/main/recover.py
+```
+
+**2. Run it** (needs `sudo` to read the card):
+```bash
+sudo python3 recover.py
+```
+
+**3. Answer a few questions** — pick your card from the list, choose what to recover (and optionally a date range or your camera's megapixels), and where to save.
+
+That's it. Recovered files land in `~/recovered`, named by capture time (e.g. `20260612_143022.jpg`) so they stay in order.
+
+<details>
+<summary>📺 What it looks like</summary>
+
+```text
+Detected disks:
+
+  [1] /dev/disk4      127.9GB  SD Card Reader (usb)
+  [a] show ALL disks    [q] quit
+
+Which disk is your card? enter the number: 1
+Selected: /dev/disk4  127.9GB  SD Card Reader
+Is this correct? [y/N]: y
+
+Reading: /dev/rdisk4  (127.9GB)  [READ-ONLY — the card is never written]
+      ... 8.1GB scanned, 642 candidates
+================================================================
+ Done. Recovered 730 complete files (7.8GB)
+ -> /Users/you/recovered
+================================================================
+```
+</details>
+
+---
+
+## What it can recover
+
+**Photos** — JPEG, HEIC  ·  **RAW** — Canon, Nikon, Sony, Fujifilm, Olympus, Panasonic, Pentax, Samsung, Leica/Adobe (DNG)  ·  **Video** — MP4, MOV
+
+---
+
+## Common questions
+
+**Is this safe for my card?**
+Yes. The card is opened **read-only** — the tool never writes to, formats, or changes it. Recovered files go to a separate folder.
+
+**Why are the file names different (not `DSCF1234.JPG`)?**
+Formatting erases the name table, so original names can't be brought back. Files are named by their capture time instead, which keeps them in shooting order.
+
+**How long does it take?**
+It reads the whole card once — roughly 20–60 minutes for a 128 GB card (longer on slow readers or with video). As long as the progress keeps updating, it's working, not stuck.
+
+**It recovered little or nothing.**
+First, make sure you ran it with `sudo`. If it's still empty, the card may have been **fully** erased (a secure/low-level format) or already overwritten by new files — those usually can't be recovered.
+
+**Some files won't open.**
+Files split into pieces across the card (large videos, heavily-used cards) can only be partially rebuilt; they're placed in a `_partial/` folder. This is a normal limit of this kind of recovery.
+
+---
+
+## Options & details
+
+<details>
+<summary><b>Command-line flags</b> (for repeat runs / automation)</summary>
+
+Anything you leave out is asked interactively.
 
 ```bash
 sudo python3 recover.py \
@@ -56,59 +99,61 @@ sudo python3 recover.py \
     --types jpeg,raw,video \     # any of: jpeg, raw, video
     --date-from 2026-06-12 \     # omit both --date-* to recover ALL dates
     --date-to   2026-06-12 \     # or --date 2026-06-12 for a single day
-    --megapixels 26              # optional: your camera's MP (sorts full-size vs thumbnails)
+    --megapixels 26              # optional: camera MP — sorts full-size from thumbnails
 
-python3 recover.py --list                       # just list disks
-python3 recover.py --image card.img --out ~/out # work on a raw image file instead
+python3 recover.py --list                        # just list disks
+python3 recover.py --image card.img --out ~/out  # work on a raw image file instead
 ```
 
-Working from an image file (`--image`) does **not** need sudo. If you prefer, make a read-only image first with `ddrescue` and recover from that.
+Working from an image file (`--image`) doesn't need `sudo`. You can also make a read-only image first with `ddrescue` and recover from that.
+</details>
 
-### Output folders
+<details>
+<summary><b>Output folders</b></summary>
 
-- main folder — your recovered files (named by capture time when readable)
+- **main folder** — your recovered files (named by capture time when readable)
 - `_unknown_date/` — files whose date couldn't be read (only when a date filter is set)
 - `_other_size/` — files that don't match `--megapixels` (likely thumbnails/previews)
-- `_partial/` — damaged or incomplete carves (`.partial`); these may not open
+- `_partial/` — damaged or incomplete files (`.partial`); these may not open
+</details>
 
-### Camera RAW coverage
+<details>
+<summary><b>Camera RAW coverage</b></summary>
 
-Fully recognised (correct extension): **Canon** CR2/CR3, **Nikon** NEF, **Sony** ARW, **Fujifilm** RAF, **Olympus/OM** ORF, **Panasonic** RW2, **Adobe/Leica** DNG, **Pentax** PEF, **Samsung** SRW, **HEIC**. Most RAW formats are TIFF-based, so even a brand not in this list is usually still recovered — just saved as `.tif`, which you can rename. A few non-TIFF formats (e.g. Sigma X3F, Phase One IIQ) aren't handled yet.
+Recognised with the correct extension: **Canon** CR2/CR3, **Nikon** NEF, **Sony** ARW, **Fujifilm** RAF, **Olympus/OM** ORF, **Panasonic** RW2, **Adobe/Leica** DNG, **Pentax** PEF, **Samsung** SRW, **HEIC**.
 
----
+Most RAW formats are TIFF-based, so even a brand not listed here is usually still recovered — just saved as `.tif`, which you can rename. A few non-TIFF formats (e.g. Sigma X3F, Phase One IIQ) aren't handled yet.
+</details>
 
-## How it works (short version)
+<details>
+<summary><b>How it works</b></summary>
 
-1. Reads the device in one pass and finds the start of every file by its **signature** (e.g. JPEG starts with `FF D8 FF`).
+1. Reads the card once and finds the start of every file by its **signature** (e.g. JPEG starts with `FF D8 FF`).
 2. Finds each file's true **end** correctly:
-   - JPEG: walks the marker segments (so an embedded thumbnail isn't mistaken for the end)
-   - HEIC/CR3/MP4/MOV: walks the ISO-BMFF box structure
-   - TIFF-based RAW: parses the IFD chain for the real extent (so the embedded preview doesn't truncate it)
-   - RAF: reads the size from its header
+   - **JPEG** — walks the marker segments, so an embedded thumbnail isn't mistaken for the end
+   - **HEIC/CR3/MP4/MOV** — walks the ISO-BMFF box structure
+   - **TIFF-based RAW** — parses the IFD chain for the real size, so the embedded preview doesn't truncate it
+   - **RAF** — reads the size from its header
 3. Optionally reads the **EXIF capture date** and keeps only your date range.
 4. Writes each recovered file to the output folder. The card is only ever read.
 
-See `recover.py` — it's commented and uses only the standard library.
+It's a single, commented file using only the Python standard library — `recover.py`.
+</details>
 
 ---
 
-## Troubleshooting
+## For developers
 
-- **No disks listed / permission error** → run with `sudo`.
-- **Very few or no files recovered** → the card may have been *fully* erased (secure-erase/low-level format) or already overwritten by new photos. Quick formats are recoverable; full erases usually are not.
-- **Original file names (e.g. `DSCF1234.JPG`) aren't restored** → expected. Formatting wipes the name table, so files are named by capture time instead.
-- **It's slow** → it reads the whole card once; a 128 GB card typically takes 20–60 minutes, longer on slow/USB-2 readers or with video. It is **not** stuck as long as the progress lines keep updating. Speed is limited by how fast the card/reader can be read — there's no way around reading the card once.
-- **Some files won't open** → carving can't rebuild *fragmented* files (large videos / heavily-used cards). Those land in `_partial/` or may be slightly corrupt. This is a normal limit of carving.
-- **Linux**: needs `lsblk` (util-linux, present by default) and `sudo`.
+```bash
+python3 tests/test_recover.py     # run the test suite
+```
 
----
-
-## Safety
-
-This tool opens the card with `O_RDONLY` and only ever reads from it. It never writes, formats, or modifies the card. Recovered files are written to a **separate** output folder. Before reading, on macOS it unmounts the card so the OS can't write to it; on Linux it attempts to unmount and warns if it can't. Either way the card is opened strictly read-only.
+Single-file, standard-library Python 3 — easy to read and audit. Issues and pull requests are welcome (e.g. support for more RAW formats).
 
 ---
 
-## License
+## Safety & license
 
-MIT — see [LICENSE](LICENSE).
+The card is opened with `O_RDONLY` and only ever read — never written, formatted, or modified. On macOS the card is unmounted first so the OS can't touch it; on Linux the tool unmounts it and warns if it can't.
+
+Released under the **MIT License** — see [LICENSE](LICENSE).

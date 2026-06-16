@@ -1,53 +1,96 @@
 # sd-photo-rescue
 
+![license](https://img.shields.io/badge/license-MIT-blue) ![python](https://img.shields.io/badge/python-3-blue) ![platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey) ![card](https://img.shields.io/badge/card-read--only-brightgreen)
+
 [English](README.md) · **한국어** · [日本語](README.ja.md)
 
-카메라/컴퓨터에서 **실수로 포맷한 SD카드**(또는 인식이 안 되는 카드)의 사진·영상을 터미널에서 복구하는 도구입니다. 파이썬 파일 하나, 설치 불필요, **읽기 전용이라 안전**합니다.
+**SD카드를 실수로 포맷하셨나요? 사진은 아직 거의 그대로 남아 있을 가능성이 높습니다.**
 
-> 포맷은 보통 "목차(파일 테이블)"만 지울 뿐, 사진 데이터는 덮어쓰기 전까지 카드에 그대로 남아 있습니다. 이 도구는 카드에 **쓰지 않고 읽기만** 하면서 내용으로 파일을 복원합니다(파일 카빙).
+sd-photo-rescue는 카드를 훑어서 사진·영상을 되살려 주는 무료 도구입니다. **읽기 전용**이라 카드를 건드리지 않고, 터미널에서 명령어 한 줄로 동작합니다. 설치할 것도, 결제할 것도 없습니다.
 
-- ✅ **JPEG**, **RAW**(Canon CR2/CR3, Nikon NEF, Sony ARW, Fujifilm RAF, Olympus ORF, Panasonic RW2, Adobe DNG, HEIC), **영상**(MP4/MOV) 복구
-- ✅ EXIF 촬영일 기준 **기간 필터** 가능
-- ✅ 카드에 **절대 쓰지 않음** — 읽기 전용으로 엽니다
-- ✅ 대화형: 디스크를 자동으로 찾아주고, 번호만 고르면 됩니다
-- ✅ 순수 Python 3 표준 라이브러리 — 설치할 것 없음
-- 💻 macOS, Linux 지원 (Windows는 현재 `--image`로 raw 이미지에서만)
+> 카메라나 컴퓨터가 카드를 "포맷"할 때는 보통 목록(색인)만 지울 뿐, 사진 데이터 자체는 지우지 않습니다. 새 파일이 덮어쓰기 전까지 사진은 카드에 그대로 남아 있습니다. 이 도구는 카드에 **전혀 쓰지 않고 읽기만** 하면서, 내용을 보고 파일을 복원합니다.
 
 ---
 
-## ⚠️ 무엇보다 먼저
+## ⚠️ 가장 먼저 하실 일
 
-**그 카드 사용을 즉시 멈추세요.** 추가 촬영 금지, 카메라/앱이 카드에 쓰게 하지 말 것, 재포맷 금지. 한 번의 쓰기로도 복구 가능한 사진이 영영 덮어써질 수 있습니다. 카드를 빼서 리더기로 작업하세요.
-
----
-
-## 빠른 시작
-
-### macOS / Linux
-
-1. 파일 하나 `recover.py`를 받습니다 (또는 이 저장소를 `git clone`).
-   ```bash
-   curl -fsSLO https://raw.githubusercontent.com/psm9619/sd-photo-rescue/main/recover.py
-   ```
-2. 카드를 꽂고 실행합니다 (raw 디바이스를 읽으려면 `sudo` 필요):
-   ```bash
-   sudo python3 recover.py
-   ```
-3. 질문에 답만 하면 됩니다:
-   - 디스크 목록이 뜨면 → 카드의 **번호를 입력**
-   - 복구할 종류 선택 (사진 / +RAW / +영상)
-   - (선택) 날짜 범위
-   - 저장 폴더 선택
-
-끝입니다. 복구된 파일은 저장 폴더(기본 `~/recovered`)에 들어가고, `20260612_143022_*.jpg`처럼 촬영시각 이름이라 시간순으로 정렬됩니다.
-
-> **디스크를 꼭 맞게 고르세요.** 도구가 용량과 "내장/외장"을 보여주고 시스템 디스크는 경고합니다. 카드는 보통 작은 **외장/이동식**(예: 64GB / 128GB)입니다.
+**지금 그 카드 사용을 멈추세요.** 사진을 더 찍지 말고, 어떤 앱도 카드에 쓰지 못하게 하고, 다시 포맷하지 마세요. 한 번의 쓰기만으로도 되살릴 수 있던 사진이 사라질 수 있습니다. 카드를 빼서 카드 리더기로 작업하세요.
 
 ---
 
-## 옵션 (반복 실행 / 자동화용)
+## 사진 되찾기 — 3단계
 
-지정하지 않은 값은 대화형으로 물어봅니다.
+**macOS** 또는 **Linux**에서:
+
+**1. 도구 받기** (파일 하나, 설치 불필요):
+```bash
+curl -fsSLO https://raw.githubusercontent.com/psm9619/sd-photo-rescue/main/recover.py
+```
+
+**2. 실행하기** (카드를 읽으려면 `sudo` 필요):
+```bash
+sudo python3 recover.py
+```
+
+**3. 질문에 답하기** — 목록에서 내 카드를 고르고, 무엇을 복구할지(원하면 날짜 범위나 카메라 화소도) 선택한 뒤 저장 위치를 정하면 됩니다.
+
+끝입니다. 복구된 파일은 `~/recovered`에 저장되며, `20260612_143022.jpg`처럼 촬영 시각으로 이름이 붙어 순서대로 정렬됩니다.
+
+<details>
+<summary>📺 실행 화면 예시</summary>
+
+```text
+Detected disks:
+
+  [1] /dev/disk4      127.9GB  SD Card Reader (usb)
+  [a] show ALL disks    [q] quit
+
+Which disk is your card? enter the number: 1
+Selected: /dev/disk4  127.9GB  SD Card Reader
+Is this correct? [y/N]: y
+
+Reading: /dev/rdisk4  (127.9GB)  [READ-ONLY — the card is never written]
+      ... 8.1GB scanned, 642 candidates
+================================================================
+ Done. Recovered 730 complete files (7.8GB)
+ -> /Users/you/recovered
+================================================================
+```
+</details>
+
+---
+
+## 복구 가능한 형식
+
+**사진** — JPEG, HEIC  ·  **RAW** — Canon, Nikon, Sony, Fujifilm, Olympus, Panasonic, Pentax, Samsung, Leica/Adobe(DNG)  ·  **영상** — MP4, MOV
+
+---
+
+## 자주 묻는 질문
+
+**제 카드에 안전한가요?**
+네. 카드는 **읽기 전용**으로만 열립니다. 쓰거나 포맷하거나 바꾸지 않습니다. 복구한 파일은 별도 폴더에 저장됩니다.
+
+**파일 이름이 원래(`DSCF1234.JPG`)와 다른데요?**
+포맷이 이름표를 지워서 원래 이름은 되살릴 수 없습니다. 대신 촬영 시각으로 이름을 붙여, 찍은 순서대로 정렬되게 했습니다.
+
+**시간이 얼마나 걸리나요?**
+카드를 한 번 통째로 읽습니다. 128GB 기준 대략 20~60분(느린 리더기나 영상이 많으면 더 오래). 진행 표시가 계속 갱신되는 동안은 멈춘 게 아니라 작업 중입니다.
+
+**거의/전혀 복구되지 않았어요.**
+먼저 `sudo`로 실행했는지 확인하세요. 그래도 비어 있다면, 빠른 포맷이 아니라 **완전 삭제**(보안/저수준 포맷)였거나 이미 새 파일로 덮어써졌을 수 있습니다. 이런 경우는 보통 복구가 어렵습니다.
+
+**일부 파일이 안 열려요.**
+카드 곳곳에 조각나 저장된 파일(큰 영상, 오래 쓴 카드)은 일부만 복원될 수 있고, `_partial/` 폴더에 따로 담깁니다. 이 방식(카빙)의 자연스러운 한계입니다.
+
+---
+
+## 옵션 & 자세한 내용
+
+<details>
+<summary><b>명령행 옵션</b> (반복 실행 / 자동화용)</summary>
+
+생략한 항목은 대화형으로 물어봅니다.
 
 ```bash
 sudo python3 recover.py \
@@ -56,59 +99,61 @@ sudo python3 recover.py \
     --types jpeg,raw,video \     # jpeg, raw, video 중 선택
     --date-from 2026-06-12 \     # --date-* 둘 다 생략하면 전체 날짜 복구
     --date-to   2026-06-12 \     # 또는 하루만: --date 2026-06-12
-    --megapixels 26              # (선택) 카메라 화소 — 풀사이즈/썸네일 분리
+    --megapixels 26              # (선택) 카메라 화소 — 풀사이즈와 썸네일 분리
 
-python3 recover.py --list                       # 디스크 목록만 출력
-python3 recover.py --image card.img --out ~/out # 디바이스 대신 이미지 파일에서 복구
+python3 recover.py --list                        # 디스크 목록만 표시
+python3 recover.py --image card.img --out ~/out  # 디바이스 대신 이미지 파일에서 복구
 ```
 
-이미지 파일(`--image`)로 작업하면 sudo가 필요 없습니다. 원하면 먼저 `ddrescue`로 읽기 전용 이미지를 떠서 거기서 복구해도 됩니다.
+이미지 파일(`--image`)로 작업하면 `sudo`가 필요 없습니다. 먼저 `ddrescue`로 읽기 전용 이미지를 떠서 거기서 복구해도 됩니다.
+</details>
 
-### 결과 폴더 구성
+<details>
+<summary><b>결과 폴더 구성</b></summary>
 
-- 메인 폴더 — 복구된 파일 (날짜를 읽을 수 있으면 촬영시각 이름)
+- **메인 폴더** — 복구된 파일 (날짜를 읽을 수 있으면 촬영 시각 이름)
 - `_unknown_date/` — 날짜를 못 읽은 파일 (날짜 필터를 켰을 때만)
 - `_other_size/` — `--megapixels`와 안 맞는 파일 (대개 썸네일/미리보기)
-- `_partial/` — 손상되거나 불완전하게 잘린 파일(`.partial`) — 안 열릴 수 있음
+- `_partial/` — 손상되거나 불완전한 파일(`.partial`) — 안 열릴 수 있음
+</details>
 
-### 카메라 RAW 지원
+<details>
+<summary><b>카메라 RAW 지원</b></summary>
 
-정확한 확장자로 인식: **Canon** CR2/CR3, **Nikon** NEF, **Sony** ARW, **Fujifilm** RAF, **Olympus/OM** ORF, **Panasonic** RW2, **Adobe/Leica** DNG, **Pentax** PEF, **Samsung** SRW, **HEIC**. 대부분의 RAW는 내부적으로 TIFF 기반이라, 이 목록에 없는 브랜드도 보통은 복구됩니다 — 단 `.tif`로 저장되니 이름만 바꾸면 됩니다. 비(非)TIFF 포맷 일부(예: Sigma X3F, Phase One IIQ)는 아직 미지원입니다.
+정확한 확장자로 인식: **Canon** CR2/CR3, **Nikon** NEF, **Sony** ARW, **Fujifilm** RAF, **Olympus/OM** ORF, **Panasonic** RW2, **Adobe/Leica** DNG, **Pentax** PEF, **Samsung** SRW, **HEIC**.
 
----
+대부분의 RAW는 내부적으로 TIFF 기반이라, 이 목록에 없는 브랜드도 보통은 복구됩니다 — 다만 `.tif`로 저장되니 이름만 바꾸면 됩니다. 일부 비(非)TIFF 형식(예: Sigma X3F, Phase One IIQ)은 아직 지원하지 않습니다.
+</details>
 
-## 동작 원리 (요약)
+<details>
+<summary><b>동작 원리</b></summary>
 
-1. 디바이스를 한 번 훑으며 각 파일의 시작을 **시그니처**로 찾습니다 (예: JPEG는 `FF D8 FF`로 시작).
+1. 카드를 한 번 읽으며 각 파일의 시작을 **시그니처**로 찾습니다 (예: JPEG는 `FF D8 FF`로 시작).
 2. 각 파일의 진짜 **끝**을 정확히 찾습니다:
-   - JPEG: 마커 세그먼트를 따라가 내장 썸네일을 끝으로 착각하지 않음
-   - HEIC/CR3/MP4/MOV: ISO-BMFF 박스 구조를 따라감
-   - TIFF 기반 RAW: IFD 체인을 파싱해 실제 크기를 계산(내장 미리보기에서 안 잘림)
-   - RAF: 헤더에서 크기를 읽음
+   - **JPEG** — 마커 구조를 따라가 내장 썸네일을 끝으로 착각하지 않음
+   - **HEIC/CR3/MP4/MOV** — ISO-BMFF 박스 구조를 따라감
+   - **TIFF 기반 RAW** — IFD 체인을 분석해 실제 크기를 계산(내장 미리보기에서 잘리지 않음)
+   - **RAF** — 헤더에서 크기를 읽음
 3. (선택) **EXIF 촬영일**을 읽어 지정한 기간만 남깁니다.
 4. 복구한 파일을 저장 폴더에 씁니다. 카드는 오직 읽기만 합니다.
 
-자세한 내용은 `recover.py` 참고 — 주석이 달려 있고 표준 라이브러리만 씁니다.
+주석이 달린 단일 파일이며 Python 표준 라이브러리만 사용합니다 — `recover.py`.
+</details>
 
 ---
 
-## 문제 해결
+## 개발자용
 
-- **디스크가 안 보임 / 권한 오류** → `sudo`로 실행하세요.
-- **거의/전혀 복구가 안 됨** → 빠른 포맷이 아니라 **완전 삭제(보안 삭제/저수준 포맷)** 였거나, 이미 새 사진으로 덮어써졌을 수 있습니다. 빠른 포맷은 복구 가능, 완전 삭제는 보통 불가.
-- **원본 파일명(`DSCF1234.JPG`)이 복원 안 됨** → 정상입니다. 포맷이 이름표를 지워서, 대신 촬영시각 이름으로 저장됩니다.
-- **느림** → 카드를 한 번은 통째로 읽습니다. 128GB면 보통 20~60분, 느린/USB2 리더나 영상이면 더 걸립니다. 진행 표시가 계속 갱신되면 **멈춘 게 아닙니다.** 속도는 카드/리더 읽기 속도가 좌우하며, 카드를 한 번 읽는 것은 피할 수 없습니다.
-- **일부 파일이 안 열림** → 카빙은 **조각난(fragmented)** 파일(큰 영상/오래 쓴 카드)은 복원하지 못합니다. 그런 파일은 `_partial/`로 가거나 약간 손상될 수 있습니다 — 카빙의 정상적인 한계입니다.
-- **Linux**: `lsblk`(util-linux, 기본 포함)와 `sudo`가 필요합니다.
+```bash
+python3 tests/test_recover.py     # 테스트 실행
+```
 
----
-
-## 안전성
-
-이 도구는 카드를 `O_RDONLY`(읽기 전용)로 열고 읽기만 합니다. 쓰기·포맷·수정을 하지 않습니다. 복구 파일은 **별도** 폴더에 저장됩니다. 읽기 전에 macOS에서는 카드를 마운트 해제해 OS가 쓰지 못하게 하고, Linux에서는 마운트 해제를 시도하고 실패 시 경고합니다. 어느 경우든 카드는 엄격히 읽기 전용으로만 엽니다.
+단일 파일, 표준 라이브러리만 쓰는 Python 3라 읽고 검토하기 쉽습니다. 이슈와 PR 환영합니다 (예: RAW 포맷 추가 지원).
 
 ---
 
-## 라이선스
+## 안전성 & 라이선스
 
-MIT — [LICENSE](LICENSE) 참고.
+카드는 `O_RDONLY`(읽기 전용)로 열려 읽기만 합니다 — 쓰기·포맷·수정을 하지 않습니다. macOS에서는 먼저 카드를 마운트 해제해 OS가 건드리지 못하게 하고, Linux에서는 마운트 해제를 시도한 뒤 실패하면 알려줍니다.
+
+**MIT 라이선스**로 배포됩니다 — [LICENSE](LICENSE) 참고.
